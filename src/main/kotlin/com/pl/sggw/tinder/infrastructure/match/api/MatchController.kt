@@ -21,25 +21,25 @@ class MatchController(
     @PostMapping("/add-decision")
     @ApiOperation("Add the user's decision about the potential partner")
     fun addUserDecision(@RequestBody request: AddUserDecisionRequest) {
-        matchDecisionRepository.addDecision(
-            UserDecisionDto(
-                selectingUserId = request.selectingUserId,
-                selectedUserId = request.selectedUserId,
-                selectedUserApproved = request.selectedUserApproved,
-                time = OffsetDateTime.now().toLocalDateTime()
-            )
+        val userDecisionDto = UserDecisionDto(
+            selectingUserEmail = request.selectingUserEmail,
+            selectedUserEmail = request.selectedUserEmail,
+            selectedUserApproved = request.selectedUserApproved,
+            time = OffsetDateTime.now().toLocalDateTime()
         )
+        matchDecisionRepository.deleteDecision(userDecisionDto)
+        matchDecisionRepository.addDecision(userDecisionDto)
     }
 
     @GetMapping("/{userEmail}")
     @ApiOperation("Get pairs for user")
-    fun getPairsUsers(@PathVariable userEmail: String): List<UserDetailsDto> {
+    fun getUserPairs(@PathVariable userEmail: String): List<UserDetailsDto> {
         val matchedForUser = matchDecisionRepository.getApproveddUserIdForUser(userEmail)
-        val userId = userService.getUserId(userEmail)
         return matchedForUser
             .mapNotNull { it }
-            .filter { matchDecisionRepository.isMatched(it, userId) }
+            .filter { matchDecisionRepository.isMatched(it, userEmail) }
             .map { userService.getUserDetailsById(it) }
             .toList()
     }
+
 }

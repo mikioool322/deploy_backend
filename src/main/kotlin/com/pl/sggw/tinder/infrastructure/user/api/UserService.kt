@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserService(val userRepository: UserRepository) {
-    fun addNewUser(userDto: UserDto) {
-        userRepository.addUser(userDto)
+    fun addNewUser(userDto: UserDto): Boolean {
+        return userRepository.addUser(userDto)
     }
 
     fun getUserId(userEmail: String): Long {
@@ -43,7 +43,11 @@ class UserService(val userRepository: UserRepository) {
         }
     }
 
-    fun getUserDetailsById(userId: Long): UserDetailsDto {
-        return userRepository.getUserDetailsById(userId)
+    fun getUserDetailsById(userEmail: String): UserDetailsDto {
+        return userRepository.getUserDetailsByEmail(userEmail)
+    }
+
+    fun tryLogin(userDto: UserDto): Boolean {
+        return userRepository.tryLogin(userDto)
     }
 }

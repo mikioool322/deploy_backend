@@ -1,16 +1,17 @@
 spring:
   datasource:
-    jdbc-url: jdbc:postgresql://localhost:5432/tinder_service
-    username: tinder_service
-    password: postgres
+    jdbc-url: jdbc:postgresql://ec2-3-223-213-207.compute-1.amazonaws.com:5432/d93g4h8bnv65q0
+    username: geriewfzcnosxt
+    password: 0a9f4f0b4eaf42d523ee63ddf474a3db11200f3933bd75f6b97b476d226ad261
     driver-class-name: org.postgresql.Driver
   flyway:
     baseline-on-migrate: true
     baseline-version: 0
     location: classpath:db/migration
     enabled: true
-    user: tinder_service
-    password: postgres
+    user: geriewfzcnosxt
+    password: 0a9f4f0b4eaf42d523ee63ddf474a3db11200f3933bd75f6b97b476d226ad261
+
 
   mvc:
     pathmatch:

@@ -68,14 +68,14 @@ open class UserMatchDecition(
     val ID: TableField<UserMatchDecitionRecord, Long?> = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "")
 
     /**
-     * The column <code>public.user_match_decition.selecting_user_id</code>.
+     * The column <code>public.user_match_decition.selecting_user_email</code>.
      */
-    val SELECTING_USER_ID: TableField<UserMatchDecitionRecord, Long?> = createField(DSL.name("selecting_user_id"), SQLDataType.BIGINT.nullable(false), this, "")
+    val SELECTING_USER_EMAIL: TableField<UserMatchDecitionRecord, String?> = createField(DSL.name("selecting_user_email"), SQLDataType.VARCHAR(126).nullable(false), this, "")
 
     /**
-     * The column <code>public.user_match_decition.selected_user_id</code>.
+     * The column <code>public.user_match_decition.selected_user_email</code>.
      */
-    val SELECTED_USER_ID: TableField<UserMatchDecitionRecord, Long?> = createField(DSL.name("selected_user_id"), SQLDataType.BIGINT.nullable(false), this, "")
+    val SELECTED_USER_EMAIL: TableField<UserMatchDecitionRecord, String?> = createField(DSL.name("selected_user_email"), SQLDataType.VARCHAR(126).nullable(false), this, "")
 
     /**
      * The column <code>public.user_match_decition.selected_user_approved</code>.
@@ -131,5 +131,5 @@ open class UserMatchDecition(
     // -------------------------------------------------------------------------
     // Row6 type methods
     // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row6<Long?, Long?, Long?, Boolean?, LocalDateTime?, LocalDateTime?> = super.fieldsRow() as Row6<Long?, Long?, Long?, Boolean?, LocalDateTime?, LocalDateTime?>
+    override fun fieldsRow(): Row6<Long?, String?, String?, Boolean?, LocalDateTime?, LocalDateTime?> = super.fieldsRow() as Row6<Long?, String?, String?, Boolean?, LocalDateTime?, LocalDateTime?>
 }

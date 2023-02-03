@@ -14,15 +14,15 @@ class JooqMatchDecisionRepository(val ctx: DSLContext) : MatchDecisionRepository
     override fun addDecision(userDecisionDto: UserDecisionDto) {
         ctx.insertInto(USER_MATCH_DECITION)
             .columns(
-                USER_MATCH_DECITION.SELECTING_USER_ID,
-                USER_MATCH_DECITION.SELECTED_USER_ID,
+                USER_MATCH_DECITION.SELECTING_USER_EMAIL,
+                USER_MATCH_DECITION.SELECTED_USER_EMAIL,
                 USER_MATCH_DECITION.SELECTED_USER_APPROVED,
                 USER_MATCH_DECITION.CREATION_TIMESTAMP,
                 USER_MATCH_DECITION.MODIFICATION_TIMESTAMP
             )
             .values(
-                userDecisionDto.selectingUserId,
-                userDecisionDto.selectedUserId,
+                userDecisionDto.selectingUserEmail,
+                userDecisionDto.selectedUserEmail,
                 userDecisionDto.selectedUserApproved,
                 userDecisionDto.time,
                 userDecisionDto.time
@@ -30,27 +30,32 @@ class JooqMatchDecisionRepository(val ctx: DSLContext) : MatchDecisionRepository
             .execute()
     }
 
-    override fun getApproveddUserIdForUser(userEmail: String): List<Long?> {
-        return ctx.select()
-            .from(USER_MATCH_DECITION)
-            .join(TINDER_USER)
-            .on(USER_MATCH_DECITION.SELECTING_USER_ID.eq(TINDER_USER.ID))
-            .where(TINDER_USER.USER_EMAIL.eq(userEmail))
-            .and(USER_MATCH_DECITION.SELECTED_USER_APPROVED)
-            .fetch(USER_MATCH_DECITION.SELECTED_USER_ID)
+    override fun deleteDecision(userDecisionDto: UserDecisionDto) {
+        ctx.deleteFrom(USER_MATCH_DECITION)
+            .where(USER_MATCH_DECITION.SELECTING_USER_EMAIL.eq(userDecisionDto.selectingUserEmail))
+            .and(USER_MATCH_DECITION.SELECTED_USER_EMAIL.eq(userDecisionDto.selectedUserEmail))
+            .execute()
     }
 
-    override fun isMatched(firstUserId: Long, secondUserId: Long): Boolean {
+    override fun getApproveddUserIdForUser(userEmail: String): List<String?> {
+        return ctx.select()
+            .from(USER_MATCH_DECITION)
+            .where(USER_MATCH_DECITION.SELECTING_USER_EMAIL.eq(userEmail))
+            .and(USER_MATCH_DECITION.SELECTED_USER_APPROVED)
+            .fetch(USER_MATCH_DECITION.SELECTED_USER_EMAIL)
+    }
+
+    override fun isMatched(firstUserEmail: String, secondUserEmail: String): Boolean {
         val firstUserPossiblePartners = ctx.select()
             .from(USER_MATCH_DECITION)
-            .where(USER_MATCH_DECITION.SELECTING_USER_ID.eq(firstUserId))
+            .where(USER_MATCH_DECITION.SELECTING_USER_EMAIL.eq(firstUserEmail))
             .and(USER_MATCH_DECITION.SELECTED_USER_APPROVED)
-            .fetch(USER_MATCH_DECITION.SELECTED_USER_ID)
+            .fetch(USER_MATCH_DECITION.SELECTED_USER_EMAIL)
         val secondPossiblePartners = ctx.select()
             .from(USER_MATCH_DECITION)
-            .where(USER_MATCH_DECITION.SELECTING_USER_ID.eq(secondUserId))
+            .where(USER_MATCH_DECITION.SELECTING_USER_EMAIL.eq(secondUserEmail))
             .and(USER_MATCH_DECITION.SELECTED_USER_APPROVED)
-            .fetch(USER_MATCH_DECITION.SELECTED_USER_ID)
-        return firstUserPossiblePartners.contains(secondUserId) && secondPossiblePartners.contains(firstUserId)
+            .fetch(USER_MATCH_DECITION.SELECTED_USER_EMAIL)
+        return firstUserPossiblePartners.contains(secondUserEmail) && secondPossiblePartners.contains(firstUserEmail)
     }
 }

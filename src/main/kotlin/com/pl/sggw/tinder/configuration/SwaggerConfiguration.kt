@@ -4,6 +4,8 @@ import org.springframework.boot.info.BuildProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.view.InternalResourceViewResolver
 import springfox.documentation.builders.RequestHandlerSelectors.basePackage
 import springfox.documentation.service.ApiInfo
@@ -41,3 +43,4 @@ class SwaggerConfiguration(private val buildProperties: BuildProperties) {
         listOf()
     )
 }
+

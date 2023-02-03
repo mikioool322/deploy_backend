@@ -7,6 +7,7 @@ import com.pl.sggw.tinder.jooq.tables.references.TINDER_USER
 import com.pl.sggw.tinder.jooq.tables.references.USER_PREFERENCES
 import org.jooq.DSLContext
 import org.jooq.Record
+import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -15,8 +16,8 @@ import java.time.LocalDateTime
 @Transactional
 @Repository
 class JooqUserRepository(val ctx: DSLContext) : UserRepository {
-    override fun addUser(userDto: UserDto) {
-        ctx.insertInto(TINDER_USER)
+    override fun addUser(userDto: UserDto) : Boolean{
+        return ctx.insertInto(TINDER_USER)
             .columns(
                 TINDER_USER.PASSWORD,
                 TINDER_USER.USER_EMAIL,
@@ -30,12 +31,13 @@ class JooqUserRepository(val ctx: DSLContext) : UserRepository {
                 userDto.time
             )
             .onConflictDoNothing()
-            .execute()
+            .execute() > 0
     }
 
     override fun upsertUserDetails(userDetailsDto: UserDetailsDto) {
         ctx.update(TINDER_USER)
             .set(TINDER_USER.PHONE_NUMBER, userDetailsDto.phoneNumber)
+            .set(TINDER_USER.NAME, userDetailsDto.userName)
             .set(TINDER_USER.PHOTO, userDetailsDto.photo)
             .set(TINDER_USER.DESCRIPTION, userDetailsDto.description)
             .set(TINDER_USER.GENDER, userDetailsDto.gender.toString())
@@ -54,10 +56,10 @@ class JooqUserRepository(val ctx: DSLContext) : UserRepository {
             .firstOrNull()
     }
 
-    override fun getUserDetailsById(userId: Long): UserDetailsDto {
+    override fun getUserDetailsByEmail(userEmail: String): UserDetailsDto {
         return ctx.select()
             .from(TINDER_USER)
-            .where(TINDER_USER.ID.eq(userId))
+            .where(TINDER_USER.USER_EMAIL.eq(userEmail))
             .fetch { r -> mapToUserDetailsDto(r) }
             .first()
     }
@@ -107,7 +109,7 @@ class JooqUserRepository(val ctx: DSLContext) : UserRepository {
             .fetch { r ->
                 UserPreferencesDto(
                     userEmail = r.getValue(USER_PREFERENCES.USER_EMAIL) as String,
-                    gender = Gender.valueOf(r.getValue(USER_PREFERENCES.USER_EMAIL) as String),
+                    gender = Gender.valueOf(r.getValue(USER_PREFERENCES.GENDER) as String),
                     minAge = r.getValue(USER_PREFERENCES.MIN_AGE) as Short,
                     maxAge = r.getValue(USER_PREFERENCES.MAX_AGE) as Short,
                     time = r.getValue(USER_PREFERENCES.MODIFICATION_TIMESTAMP) as LocalDateTime
@@ -132,8 +134,17 @@ class JooqUserRepository(val ctx: DSLContext) : UserRepository {
             .first()
     }
 
+    override fun tryLogin(userDto: UserDto): Boolean {
+        return ctx.select()
+            .from(TINDER_USER)
+            .where(TINDER_USER.USER_EMAIL.eq(userDto.userEmail))
+            .and(TINDER_USER.PASSWORD.eq(userDto.password))
+            .execute() > 0
+    }
+
     private fun mapToUserDetailsDto(r: Record) = UserDetailsDto(
         userEmail = r.getValue(TINDER_USER.USER_EMAIL)!!,
+        userName = r.getValue(TINDER_USER.NAME)!!,
         description = r.getValue(TINDER_USER.DESCRIPTION),
         phoneNumber = r.getValue(TINDER_USER.PHONE_NUMBER) ,
         photo = r.getValue(TINDER_USER.PHOTO),

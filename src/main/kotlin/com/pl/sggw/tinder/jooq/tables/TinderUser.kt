@@ -6,6 +6,7 @@ package com.pl.sggw.tinder.jooq.tables
 
 import com.pl.sggw.tinder.jooq.Public
 import com.pl.sggw.tinder.jooq.keys.TINDER_USER_PKEY
+import com.pl.sggw.tinder.jooq.keys.TINDER_USER_USER_EMAIL_KEY
 import com.pl.sggw.tinder.jooq.tables.records.TinderUserRecord
 
 import java.time.LocalDateTime
@@ -17,7 +18,7 @@ import org.jooq.ForeignKey
 import org.jooq.Identity
 import org.jooq.Name
 import org.jooq.Record
-import org.jooq.Row11
+import org.jooq.Row12
 import org.jooq.Schema
 import org.jooq.Table
 import org.jooq.TableField
@@ -70,12 +71,17 @@ open class TinderUser(
     /**
      * The column <code>public.tinder_user.user_email</code>.
      */
-    val USER_EMAIL: TableField<TinderUserRecord, String?> = createField(DSL.name("user_email"), SQLDataType.VARCHAR(126).nullable(false), this, "")
+    val USER_EMAIL: TableField<TinderUserRecord, String?> = createField(DSL.name("user_email"), SQLDataType.VARCHAR(126), this, "")
 
     /**
      * The column <code>public.tinder_user.password</code>.
      */
     val PASSWORD: TableField<TinderUserRecord, String?> = createField(DSL.name("password"), SQLDataType.VARCHAR(100).nullable(false), this, "")
+
+    /**
+     * The column <code>public.tinder_user.name</code>.
+     */
+    val NAME: TableField<TinderUserRecord, String?> = createField(DSL.name("name"), SQLDataType.VARCHAR(126).nullable(false), this, "")
 
     /**
      * The column <code>public.tinder_user.description</code>.
@@ -139,7 +145,7 @@ open class TinderUser(
     override fun getSchema(): Schema = Public.PUBLIC
     override fun getIdentity(): Identity<TinderUserRecord, Long?> = super.getIdentity() as Identity<TinderUserRecord, Long?>
     override fun getPrimaryKey(): UniqueKey<TinderUserRecord> = TINDER_USER_PKEY
-    override fun getKeys(): List<UniqueKey<TinderUserRecord>> = listOf(TINDER_USER_PKEY)
+    override fun getKeys(): List<UniqueKey<TinderUserRecord>> = listOf(TINDER_USER_PKEY, TINDER_USER_USER_EMAIL_KEY)
     override fun `as`(alias: String): TinderUser = TinderUser(DSL.name(alias), this)
     override fun `as`(alias: Name): TinderUser = TinderUser(alias, this)
 
@@ -154,7 +160,7 @@ open class TinderUser(
     override fun rename(name: Name): TinderUser = TinderUser(name, null)
 
     // -------------------------------------------------------------------------
-    // Row11 type methods
+    // Row12 type methods
     // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row11<Long?, String?, String?, String?, String?, String?, String?, Short?, String?, LocalDateTime?, LocalDateTime?> = super.fieldsRow() as Row11<Long?, String?, String?, String?, String?, String?, String?, Short?, String?, LocalDateTime?, LocalDateTime?>
+    override fun fieldsRow(): Row12<Long?, String?, String?, String?, String?, String?, String?, String?, Short?, String?, LocalDateTime?, LocalDateTime?> = super.fieldsRow() as Row12<Long?, String?, String?, String?, String?, String?, String?, String?, Short?, String?, LocalDateTime?, LocalDateTime?>
 }
